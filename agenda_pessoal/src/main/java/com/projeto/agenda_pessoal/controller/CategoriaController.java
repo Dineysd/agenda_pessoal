@@ -1,12 +1,12 @@
 package com.projeto.agenda_pessoal.controller;
 
-import java.net.URI;
 import java.util.List;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -16,8 +16,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import com.projeto.agenda_pessoal.event.RecursoCriadoEvent;
 import com.projeto.agenda_pessoal.model.Categoria;
 import com.projeto.agenda_pessoal.repository.CategoriaRepository;
 
@@ -28,6 +28,9 @@ public class CategoriaController {
 	@Autowired
 	private CategoriaRepository repository;
 	
+	@Autowired
+	private ApplicationEventPublisher publisher;
+	
 	@GetMapping
 	public List<Categoria> listar(){
 		return repository.findAll();
@@ -37,13 +40,10 @@ public class CategoriaController {
 	@ResponseStatus(HttpStatus.CREATED)
 	public ResponseEntity<Categoria> criar(@Valid @RequestBody Categoria categoria, HttpServletResponse response) {
 		Categoria categoriaSalva = repository.save(categoria);
-		// retorna oa uri da categoria que foi salva
-		URI uri = ServletUriComponentsBuilder.fromCurrentRequestUri().path("/{codigo}")
-		.buildAndExpand(categoriaSalva.getCodigo()).toUri();
+		//criando evento para header location
+		publisher.publishEvent(new RecursoCriadoEvent(this, response, categoriaSalva.getCodigo()));
 		
-		response.setHeader("Location", uri.toASCIIString());
-		
-		return ResponseEntity.created(uri).body(categoriaSalva);
+		return ResponseEntity.status(HttpStatus.CREATED).body(categoriaSalva);
 	}
 	
 	@GetMapping("/{codigo}")
@@ -52,4 +52,6 @@ public class CategoriaController {
 				.map(categoria -> ResponseEntity.ok(categoria))
 			      .orElse(ResponseEntity.notFound().build());
 	}
+	
+	
 }
