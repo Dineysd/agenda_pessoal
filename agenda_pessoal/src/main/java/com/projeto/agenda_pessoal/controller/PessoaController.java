@@ -1,18 +1,22 @@
 package com.projeto.agenda_pessoal.controller;
 
 import java.util.List;
+import java.util.Optional;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -21,6 +25,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.projeto.agenda_pessoal.event.RecursoCriadoEvent;
 import com.projeto.agenda_pessoal.model.Pessoa;
 import com.projeto.agenda_pessoal.repository.PessoaRepository;
+import com.projeto.agenda_pessoal.service.PessoaService;
 
 @RestController
 @RequestMapping("/pessoas")
@@ -28,6 +33,9 @@ public class PessoaController {
 	
 	@Autowired
 	private PessoaRepository repository;
+	
+	@Autowired
+	private PessoaService service;
 	
 	@Autowired
 	private ApplicationEventPublisher publisher;
@@ -59,4 +67,12 @@ public class PessoaController {
 	public void excluir(@PathVariable Long codigo) {
 		 repository.deleteById(codigo);
 	}
+	
+	@PutMapping("/{codigo}")
+	public ResponseEntity<Pessoa> Atualizar(@PathVariable Long codigo,@Valid @RequestBody Pessoa pessoa) {
+		
+		return ResponseEntity.ok(service.update(codigo, pessoa));
+		
+	}
+
 }
