@@ -70,8 +70,14 @@ public class PessoaController {
 	
 	@PutMapping("/{codigo}")
 	public ResponseEntity<Pessoa> Atualizar(@PathVariable Long codigo,@Valid @RequestBody Pessoa pessoa) {
-		
 		return ResponseEntity.ok(service.update(codigo, pessoa));
+		
+	}
+	
+	@PutMapping("/{codigo}/ativo")
+	@ResponseStatus(HttpStatus.NO_CONTENT)
+	public void AtualizarPessoasAtiva(@PathVariable Long codigo, @RequestBody Boolean ativo) {
+		 service.updateActivePerson(codigo, ativo);
 		
 	}
 

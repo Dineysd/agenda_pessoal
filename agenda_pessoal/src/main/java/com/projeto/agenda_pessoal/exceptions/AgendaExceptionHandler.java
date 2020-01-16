@@ -33,7 +33,7 @@ class AgendaExceptionHandler extends ResponseEntityExceptionHandler{
 			HttpHeaders headers, HttpStatus status, WebRequest request) {
 		// TODO Auto-generated method stub
 		String mensagemUsario = message.getMessage("mensagem.invalida",null, LocaleContextHolder.getLocale());
-		String mensagemDeveloper = ex.getCause().toString();
+		String mensagemDeveloper = ex.getCause() != null? ex.getCause().toString(): ex.toString();
 		List<Erro> erros = Arrays.asList(new Erro(mensagemUsario,mensagemDeveloper));
 		return handleExceptionInternal(ex, erros, headers, HttpStatus.BAD_REQUEST, request);
 	}
