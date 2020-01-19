@@ -4,9 +4,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -23,7 +25,7 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 
 
 @ControllerAdvice
-class AgendaExceptionHandler extends ResponseEntityExceptionHandler{
+public class AgendaExceptionHandler extends ResponseEntityExceptionHandler{
 	
 	@Autowired
 	private MessageSource message;
@@ -44,6 +46,15 @@ class AgendaExceptionHandler extends ResponseEntityExceptionHandler{
 		// TODO Auto-generated method stub
 		List<Erro> erros = criarListaErros(ex.getBindingResult());
 		return handleExceptionInternal(ex, erros, headers, HttpStatus.BAD_REQUEST, request);
+	}
+	
+	@ExceptionHandler({DataIntegrityViolationException.class})
+	protected ResponseEntity<Object> handleDataIntegrityViolationException(DataIntegrityViolationException ex, WebRequest request) {
+		// TODO Auto-generated method stub
+		String mensagemUsario = message.getMessage("recurso.operacao_nao_pemitida",null, LocaleContextHolder.getLocale());
+		String mensagemDeveloper = ExceptionUtils.getRootCauseMessage(ex);
+		List<Erro> erros = Arrays.asList(new Erro(mensagemUsario,mensagemDeveloper));
+		return handleExceptionInternal(ex, erros, new HttpHeaders(), HttpStatus.BAD_REQUEST, request);
 	}
 	
 	@ExceptionHandler({EmptyResultDataAccessException.class})

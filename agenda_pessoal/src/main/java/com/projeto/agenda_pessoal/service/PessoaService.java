@@ -28,10 +28,8 @@ public class PessoaService {
 		pessoaSalva.setAtivo(ativo);
 		repository.save(pessoaSalva);
 	}
-	
-	
 
-	private Pessoa fetchPeopleById(Long codigo) {
+	public Pessoa fetchPeopleById(Long codigo) {
 		Pessoa pessoa = repository.findById(codigo)
 				.orElseThrow(()-> new EmptyResultDataAccessException(1));
 		return pessoa;
