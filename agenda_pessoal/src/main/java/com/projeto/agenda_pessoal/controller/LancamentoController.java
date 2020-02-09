@@ -31,6 +31,7 @@ import com.projeto.agenda_pessoal.exceptions.PessoaInativaException;
 import com.projeto.agenda_pessoal.model.Lancamento;
 import com.projeto.agenda_pessoal.repository.LancamentoRepository;
 import com.projeto.agenda_pessoal.repository.filter.LancamentoFilter;
+import com.projeto.agenda_pessoal.repository.projection.ResumoLancamento;
 import com.projeto.agenda_pessoal.service.LancamentoService;
 
 @RestController
@@ -53,6 +54,12 @@ public class LancamentoController {
 	@PreAuthorize("hasAuthority('ROLE_PESQUISAR_LANCAMENTO') and #oauth2.hasScope('read')")
 	public Page<Lancamento> pesquisar(LancamentoFilter filter, Pageable page){
 		return repository.filtrar(filter, page);
+	}
+	
+	@GetMapping(params = "resumo")
+	@PreAuthorize("hasAuthority('ROLE_PESQUISAR_LANCAMENTO') and #oauth2.hasScope('read')")
+	public Page<ResumoLancamento> resumir(LancamentoFilter lancamentoFilter, Pageable pageable) {
+		return repository.resumir(lancamentoFilter, pageable);
 	}
 	
 	//@GetMapping
